@@ -99,20 +99,6 @@ if ! remote_exec "command -v tailscale &> /dev/null"; then
 else
     echo "Tailscale is already installed, checking network configuration..."
     # Even if Tailscale is installed, ensure network settings are correct
-    remote_exec "grep -q 'net.ipv4.ip_forward = 1' /etc/sysctl.conf || echo 'net.ipv4.ip_forward = 1' | sudo tee -a /etc/sysctl.conf"
-    remote_exec "grep -q 'net.ipv6.conf.all.forwarding = 1' /etc/sysctl.conf || echo 'net.ipv6.conf.all.forwarding = 1' | sudo tee -a /etc/sysctl.conf"
-    remote_exec "sudo sysctl -p /etc/sysctl.conf"
-
-    # Check if UFW is present and remove it
-    remote_exec "dpkg -l | grep -q '^ii.*ufw' && sudo apt-get purge -y ufw || true"
-    
-    # Configure iptables
-    remote_exec "sudo iptables -P INPUT ACCEPT"
-    remote_exec "sudo iptables -P OUTPUT ACCEPT"
-    remote_exec "sudo iptables -P FORWARD ACCEPT"
-    remote_exec "sudo iptables -F"
-
-    # Check if Tailscale is running or if we have a key to force restart
     if ! remote_exec "sudo tailscale status &> /dev/null" || [ -n "$TAILSCALE_KEY" ]; then
         start_tailscale
     fi
