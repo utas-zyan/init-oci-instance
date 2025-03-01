@@ -106,3 +106,5 @@ fi
 
 echo "Remote initialization complete!"
 echo "Please log out and log back in to the remote machine for docker group changes to take effect."
+
+sudo apt-get install -y rsync
